@@ -44,6 +44,15 @@ class AuraSkinViewModel(
     private val _completedWeeklySteps = MutableStateFlow<Set<Int>>(emptySet())
     val completedWeeklySteps: StateFlow<Set<Int>> = _completedWeeklySteps.asStateFlow()
 
+    // Dark Mode Support
+    private val _isDarkMode = MutableStateFlow<Boolean?>(null)
+    val isDarkMode: StateFlow<Boolean?> = _isDarkMode.asStateFlow()
+
+    fun toggleDarkMode(currentSystemDark: Boolean) {
+        val current = _isDarkMode.value ?: currentSystemDark
+        _isDarkMode.value = !current
+    }
+
     // History from Room database
     val analysesHistory: StateFlow<List<SkinAnalysisEntity>> = repository.allItems
         .stateIn(
@@ -129,6 +138,15 @@ class AuraSkinViewModel(
     fun deleteHistoryItem(id: Long) {
         viewModelScope.launch {
             repository.deleteAnalysis(id)
+        }
+    }
+
+    fun updateAnalysisNotes(id: Long, notes: String) {
+        viewModelScope.launch {
+            repository.getAnalysisById(id)?.let { entity ->
+                val updated = entity.copy(notes = notes)
+                repository.insertAnalysis(updated)
+            }
         }
     }
 

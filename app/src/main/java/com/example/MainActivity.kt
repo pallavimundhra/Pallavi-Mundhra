@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.data.SkinDatabase
 import com.example.data.SkinAnalysisRepository
 import com.example.ui.screens.MainScreen
@@ -30,7 +33,9 @@ class MainActivity : ComponentActivity() {
         
         // 4. Mount User Interface
         setContent {
-            AuraSkinTheme {
+            val isDarkModeOverride by viewModel.isDarkMode.collectAsState(initial = null)
+            val useDarkTheme = isDarkModeOverride ?: isSystemInDarkTheme()
+            AuraSkinTheme(darkTheme = useDarkTheme) {
                 MainScreen(viewModel)
             }
         }

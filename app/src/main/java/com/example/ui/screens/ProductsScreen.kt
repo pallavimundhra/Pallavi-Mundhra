@@ -6,6 +6,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -36,6 +37,8 @@ import com.example.ui.viewmodel.AuraSkinViewModel
 fun ProductsScreen(viewModel: AuraSkinViewModel) {
     val context = LocalContext.current
     val activeReport by viewModel.activeReport.collectAsState()
+    val isDarkModeOverride by viewModel.isDarkMode.collectAsState(initial = null)
+    val useDarkTheme = isDarkModeOverride ?: isSystemInDarkTheme()
 
     var activeTier by remember { mutableStateOf(0) } // 0: Budget, 1: Standard, 2: Premium
     val tierLabels = listOf("💰 Budget Plan", "💎 Standard Plan", "✨ Premium Plan")
@@ -56,18 +59,33 @@ fun ProductsScreen(viewModel: AuraSkinViewModel) {
                     .background(Brush.verticalGradient(listOf(PastelGreen.copy(alpha = 0.3f), Color.Transparent)))
                     .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
-                Column {
-                    Text(
-                        text = "🛒 Loot & Snoop Market",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = SlateCharcoal,
-                        fontWeight = FontWeight.Black
-                    )
-                    Text(
-                        text = "Secrets & hair elixirs curated for your scalp and budget! Direct buy on click. 💸",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = SlateMuted
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "🛒 Loot & Snoop Market",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "Secrets & hair elixirs curated for your scalp and budget! Direct buy on click. 💸",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.toggleDarkMode(useDarkTheme) },
+                        modifier = Modifier.testTag("dark_mode_toggle_products")
+                    ) {
+                        Icon(
+                            imageVector = if (useDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle Theme",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }

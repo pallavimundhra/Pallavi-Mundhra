@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.res.painterResource
 import com.example.R
 import coil.compose.rememberAsyncImagePainter
@@ -47,6 +48,8 @@ fun AnalyzeScreen(viewModel: AuraSkinViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val activeReport by viewModel.activeReport.collectAsState()
     val history by viewModel.analysesHistory.collectAsState()
+    val isDarkModeOverride by viewModel.isDarkMode.collectAsState(initial = null)
+    val useDarkTheme = isDarkModeOverride ?: isSystemInDarkTheme()
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -110,18 +113,30 @@ fun AnalyzeScreen(viewModel: AuraSkinViewModel) {
                             .border(1.5.dp, BabyBlue, RoundedCornerShape(16.dp))
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Column {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text(
                             text = "🕵️‍♂️ RootSnoop",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = SlateCharcoal,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Black
                         )
                         Text(
                             text = "Snooping out oily roots, dry scalps & weak hair strands! 👀",
                             style = MaterialTheme.typography.bodySmall,
-                            color = SlateMuted,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.toggleDarkMode(useDarkTheme) },
+                        modifier = Modifier.testTag("dark_mode_toggle_analyze")
+                    ) {
+                        Icon(
+                            imageVector = if (useDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle Theme",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -415,7 +430,7 @@ fun AnalyzeScreen(viewModel: AuraSkinViewModel) {
 
                         Spacer(modifier = Modifier.width(20.dp))
 
-                        // Skin Type Details
+                        // Hair/Scalp Type Details
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
@@ -432,7 +447,7 @@ fun AnalyzeScreen(viewModel: AuraSkinViewModel) {
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Confidence: ${report.skinTypeScore}%",
+                                    text = "Root Strength Index: ${report.skinTypeScore}%",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = SlateMuted,
                                     fontWeight = FontWeight.Medium

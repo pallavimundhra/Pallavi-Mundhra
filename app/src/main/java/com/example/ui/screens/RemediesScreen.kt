@@ -2,14 +2,13 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Spa
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +26,8 @@ import com.example.ui.viewmodel.AuraSkinViewModel
 @Composable
 fun RemediesScreen(viewModel: AuraSkinViewModel) {
     val activeReport by viewModel.activeReport.collectAsState()
+    val isDarkModeOverride by viewModel.isDarkMode.collectAsState(initial = null)
+    val useDarkTheme = isDarkModeOverride ?: isSystemInDarkTheme()
     val report = activeReport
 
     LazyColumn(
@@ -43,18 +44,33 @@ fun RemediesScreen(viewModel: AuraSkinViewModel) {
                     .background(Brush.verticalGradient(listOf(SoftLavender.copy(alpha = 0.3f), Color.Transparent)))
                     .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
-                Column {
-                    Text(
-                        text = "🧪 DIY Hair & Scalp Kitchen",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = SlateCharcoal,
-                        fontWeight = FontWeight.Black
-                    )
-                    Text(
-                        text = "Trichologist-approved kitchen potions to instantly soothe your active hair & scalp concerns! 🥗",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = SlateMuted
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "🧪 DIY Hair & Scalp Kitchen",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "Trichologist-approved kitchen potions to instantly soothe your active hair & scalp concerns! 🥗",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.toggleDarkMode(useDarkTheme) },
+                        modifier = Modifier.testTag("dark_mode_toggle_remedies")
+                    ) {
+                        Icon(
+                            imageVector = if (useDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle Theme",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }

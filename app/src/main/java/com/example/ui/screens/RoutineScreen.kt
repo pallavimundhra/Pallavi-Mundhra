@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +35,8 @@ fun RoutineScreen(viewModel: AuraSkinViewModel) {
     val completedMorning by viewModel.completedMorningSteps.collectAsState()
     val completedEvening by viewModel.completedEveningSteps.collectAsState()
     val completedWeekly by viewModel.completedWeeklySteps.collectAsState()
+    val isDarkModeOverride by viewModel.isDarkMode.collectAsState(initial = null)
+    val useDarkTheme = isDarkModeOverride ?: isSystemInDarkTheme()
 
     var activeTab by remember { mutableStateOf(0) } // 0: Morning, 1: Evening, 2: Weekly
     val tabLabels = listOf("☀️ Morning", "🌙 Evening", "🗓️ Weekly Plan")
@@ -54,18 +57,33 @@ fun RoutineScreen(viewModel: AuraSkinViewModel) {
                     .background(Brush.verticalGradient(listOf(PastelPink.copy(alpha = 0.3f), Color.Transparent)))
                     .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
-                Column {
-                    Text(
-                        text = "⏰ Crown Checklist",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = SlateCharcoal,
-                        fontWeight = FontWeight.Black
-                    )
-                    Text(
-                        text = "Personalized hair & scalp battle plan! Tick off each step to level up your crown score. 🚀",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = SlateMuted
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "⏰ Crown Checklist",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "Personalized hair & scalp battle plan! Tick off each step to level up your crown score. 🚀",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.toggleDarkMode(useDarkTheme) },
+                        modifier = Modifier.testTag("dark_mode_toggle_routine")
+                    ) {
+                        Icon(
+                            imageVector = if (useDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle Theme",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
