@@ -1,0 +1,6 @@
+{
+  "name": "RootSnoop",
+  "description": "Quirky AI Hair & Scalp Detective, Routine builder & Product recommender",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
